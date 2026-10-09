@@ -6,7 +6,6 @@
     <title>Monitor Multiversal | RICK OS</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-        
         :root { --bg-color: #050505; --panel-bg: #111; --neon-green: #00ff41; --neon-red: #ff003c; --text-main: #e0e0e0; }
         body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Share Tech Mono', monospace; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         h1 { color: var(--neon-green); text-shadow: 0 0 10px rgba(0, 255, 65, 0.5); text-align: center; border-bottom: 1px solid var(--neon-green); padding-bottom: 10px; width: 100%; max-width: 900px; }
@@ -69,11 +68,7 @@
     </div>
 
     <script>
-        // 🔗 TU NUEVO PUENTE TRASERO EXCLUSIVO
-        const API_URL = "https://rick-api-monitor.loca.lt";
-        
-        // Llave maestra para pasar de largo la advertencia de LocalTunnel
-        const HEADERS_API = { "Bypass-Tunnel-Reminder": "true", "Content-Type": "application/json" };
+        const API_URL = "https://rick-the-adriano-mx-v143.serveo.net";
 
         function calcularUptime(msInicio) {
             const diff = Date.now() - msInicio;
@@ -85,7 +80,11 @@
 
         async function actualizarRadar() {
             try {
-                const res = await fetch(`${API_URL}/api/subbots_stats`, { headers: HEADERS_API });
+                const res = await fetch(`${API_URL}/api/subbots_stats`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({})
+                });
                 const data = await res.json();
                 
                 if (data.success) {
@@ -93,7 +92,7 @@
                     const tbody = document.getElementById('tabla_bots');
                     
                     if (data.totalActivos === 0) {
-                        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay Sub-Bots activos en este momento.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay Sub-Bots activos en la memoria.</td></tr>`;
                         return;
                     }
 
@@ -107,15 +106,13 @@
                             <td>${calcularUptime(bot.uptime)}</td>
                             <td class="stats-ok">${bot.stats.comandosUsados}</td>
                             <td class="${bot.stats.errores > 0 ? 'stats-err' : ''}">${bot.stats.errores}</td>
-                            <td>
-                                <a href="https://wa.me/${bot.id}" target="_blank" class="btn-wa">Mensaje</a>
-                            </td>
+                            <td><a href="https://wa.me/${bot.id}" target="_blank" class="btn-wa">Mensaje</a></td>
                         `;
                         tbody.appendChild(tr);
                     });
                 }
             } catch (error) {
-                console.error("Esperando red...");
+                console.error("Esperando red...", error);
             }
         }
 
@@ -129,14 +126,18 @@
             try {
                 await fetch(`${API_URL}/api/generar_codigo`, {
                     method: 'POST',
-                    headers: HEADERS_API,
+                    headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({ numero: numero })
                 });
 
                 document.getElementById('pairing_text').innerText = "ESPERANDO A WHATSAPP...";
 
                 const intervalo = setInterval(async () => {
-                    const res = await fetch(`${API_URL}/api/leer_codigo?id=${numero}`, { headers: HEADERS_API });
+                    const res = await fetch(`${API_URL}/api/leer_codigo`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain' },
+                        body: JSON.stringify({ id: numero })
+                    });
                     const data = await res.json();
                     
                     if (data.success && data.codigo) {
@@ -153,13 +154,12 @@
                 }, 30000);
 
             } catch (e) {
-                document.getElementById('pairing_text').innerText = "ERROR DE TÚNEL";
+                document.getElementById('pairing_text').innerText = "ERROR DE CONEXIÓN";
             }
         }
 
         actualizarRadar();
         setInterval(actualizarRadar, 5000);
-
     </script>
 </body>
 </html>
