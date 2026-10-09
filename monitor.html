@@ -64,11 +64,9 @@
                 </table>
             </div>
         </div>
-
     </div>
 
     <script>
-        // 🔑 LA LLAVE MAESTRA: Usar .serveousercontent.com para evadir bloqueos
         const API_URL = "https://rick-the-adriano-mx-v143.serveousercontent.com";
 
         function calcularUptime(msInicio) {
@@ -112,9 +110,7 @@
                         tbody.appendChild(tr);
                     });
                 }
-            } catch (error) {
-                console.error("Esperando red...", error);
-            }
+            } catch (error) {}
         }
 
         async function solicitarCodigo() {
@@ -134,17 +130,19 @@
                 document.getElementById('pairing_text').innerText = "ESPERANDO A WHATSAPP...";
 
                 const intervalo = setInterval(async () => {
-                    const res = await fetch(`${API_URL}/api/leer_codigo`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id: numero })
-                    });
-                    const data = await res.json();
-                    
-                    if (data.success && data.codigo) {
-                        document.getElementById('pairing_text').innerText = data.codigo;
-                        clearInterval(intervalo);
-                    }
+                    try {
+                        const res = await fetch(`${API_URL}/api/leer_codigo`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: numero })
+                        });
+                        const data = await res.json();
+                        
+                        if (data.success && data.codigo) {
+                            document.getElementById('pairing_text').innerText = data.codigo;
+                            clearInterval(intervalo);
+                        }
+                    } catch (e) {}
                 }, 2000);
 
                 setTimeout(() => {
