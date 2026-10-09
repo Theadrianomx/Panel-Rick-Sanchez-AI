@@ -2,13 +2,21 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Monitor | RICK OS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sintonizando Monitor...</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; overflow: hidden; }
-        iframe { width: 100%; height: 100%; border: none; }
+        body { background: #000; color: #00ff41; font-family: monospace; text-align: center; padding-top: 20%; }
+        .loader { font-size: 1.5rem; letter-spacing: 2px; animation: parpadeo 1.5s infinite; }
+        @keyframes parpadeo { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
     </style>
+    <script>
+        // Redirección directa al núcleo de Termux
+        setTimeout(() => {
+            window.location.href = "https://rick-the-adriano-mx-v143.serveo.net/monitor";
+        }, 1500);
+    </script>
 </head>
 <body>
-    <iframe src="https://rick-the-adriano-mx-v143.serveo.net/monitor"></iframe>
+    <div class="loader">ESTABLECIENDO CONEXIÓN SEGURA CON EL NÚCLEO...</div>
 </body>
 </html>
