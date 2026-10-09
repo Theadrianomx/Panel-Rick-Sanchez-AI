@@ -68,7 +68,8 @@
     </div>
 
     <script>
-        const API_URL = "https://rick-the-adriano-mx-v143.serveo.net";
+        // 🔑 LA LLAVE MAESTRA: Usar .serveousercontent.com para evadir bloqueos
+        const API_URL = "https://rick-the-adriano-mx-v143.serveousercontent.com";
 
         function calcularUptime(msInicio) {
             const diff = Date.now() - msInicio;
@@ -82,7 +83,7 @@
             try {
                 const res = await fetch(`${API_URL}/api/subbots_stats`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({})
                 });
                 const data = await res.json();
@@ -126,7 +127,7 @@
             try {
                 await fetch(`${API_URL}/api/generar_codigo`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ numero: numero })
                 });
 
@@ -135,7 +136,7 @@
                 const intervalo = setInterval(async () => {
                     const res = await fetch(`${API_URL}/api/leer_codigo`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'text/plain' },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ id: numero })
                     });
                     const data = await res.json();
