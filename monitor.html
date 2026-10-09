@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,9 +9,35 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
         
-        :root { --bg-color: #050505; --panel-bg: #111; --neon-green: #00ff41; --neon-red: #ff003c; --text-main: #e0e0e0; }
-        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Share Tech Mono', monospace; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        h1 { color: var(--neon-green); text-shadow: 0 0 10px rgba(0, 255, 65, 0.5); text-align: center; border-bottom: 1px solid var(--neon-green); padding-bottom: 10px; width: 100%; max-width: 900px; }
+        :root {
+            --bg-color: #050505;
+            --panel-bg: #111;
+            --neon-green: #00ff41;
+            --neon-red: #ff003c;
+            --text-main: #e0e0e0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Share Tech Mono', monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--neon-green);
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+            text-align: center;
+            border-bottom: 1px solid var(--neon-green);
+            padding-bottom: 10px;
+            width: 100%;
+            max-width: 900px;
+        }
+
         .container { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 20px; }
         .card { background: var(--panel-bg); border: 1px solid #333; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
         .card h2 { margin-top: 0; color: var(--neon-green); font-size: 1.2rem; }
@@ -67,11 +95,8 @@
     </div>
 
     <script>
-        // 🔗 URL de LocalTunnel
-        const API_URL = "https://rick-api-v137.loca.lt";
-        
-        // 🗝️ Cabecera para saltar la pantalla de bloqueo de LocalTunnel
-        const HEADERS_BYPASS = { "Bypass-Tunnel-Reminder": "true" };
+        // 🔗 TU NUEVO TÚNEL ANTI-BLOQUEOS
+        const API_URL = "https://rick-api-adriano-v14.serveo.net";
 
         function calcularUptime(msInicio) {
             const diff = Date.now() - msInicio;
@@ -83,7 +108,7 @@
 
         async function actualizarRadar() {
             try {
-                const res = await fetch(`${API_URL}/api/subbots_stats`, { headers: HEADERS_BYPASS });
+                const res = await fetch(`${API_URL}/api/subbots_stats`);
                 const data = await res.json();
                 
                 if (data.success) {
@@ -91,7 +116,7 @@
                     const tbody = document.getElementById('tabla_bots');
                     
                     if (data.totalActivos === 0) {
-                        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay Sub-Bots activos en la RAM. Escríbele a uno para registrarlo.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay Sub-Bots activos. Escríbele a uno para que aparezca.</td></tr>`;
                         return;
                     }
 
@@ -111,7 +136,7 @@
                     });
                 }
             } catch (error) {
-                console.error("Esperando conexión o túnel apagado...");
+                console.error("Esperando conexión...");
             }
         }
 
@@ -123,18 +148,17 @@
             document.getElementById('pairing_text').innerText = "CONECTANDO AL SERVIDOR...";
             
             try {
-                // 1. Enviamos la orden de generar
+                // 1. Enviamos la orden a Termux para que empiece a pedir el código
                 await fetch(`${API_URL}/api/generar_codigo`, {
                     method: 'POST',
-                    headers: { ...HEADERS_BYPASS, "Content-Type": "application/json" },
                     body: JSON.stringify({ numero: numero })
                 });
 
                 document.getElementById('pairing_text').innerText = "ESPERANDO A WHATSAPP...";
 
-                // 2. Preguntamos por el código cada 2 segundos
+                // 2. Le preguntamos a Termux cada 2 segundos si ya tiene el código
                 const intervalo = setInterval(async () => {
-                    const res = await fetch(`${API_URL}/api/leer_codigo?id=${numero}`, { headers: HEADERS_BYPASS });
+                    const res = await fetch(`${API_URL}/api/leer_codigo?id=${numero}`);
                     const data = await res.json();
                     
                     if (data.success && data.codigo) {
@@ -143,6 +167,7 @@
                     }
                 }, 2000);
 
+                // Si WhatsApp no responde en 30 segundos, detenemos la búsqueda
                 setTimeout(() => {
                     clearInterval(intervalo);
                     if(document.getElementById('pairing_text').innerText === "ESPERANDO A WHATSAPP...") {
@@ -151,7 +176,7 @@
                 }, 30000);
 
             } catch (e) {
-                document.getElementById('pairing_text').innerText = "ERROR DE TÚNEL";
+                document.getElementById('pairing_text').innerText = "TÚNEL CERRADO";
             }
         }
 
