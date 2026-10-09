@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,35 +7,9 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
         
-        :root {
-            --bg-color: #050505;
-            --panel-bg: #111;
-            --neon-green: #00ff41;
-            --neon-red: #ff003c;
-            --text-main: #e0e0e0;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'Share Tech Mono', monospace;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        h1 {
-            color: var(--neon-green);
-            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
-            text-align: center;
-            border-bottom: 1px solid var(--neon-green);
-            padding-bottom: 10px;
-            width: 100%;
-            max-width: 900px;
-        }
-
+        :root { --bg-color: #050505; --panel-bg: #111; --neon-green: #00ff41; --neon-red: #ff003c; --text-main: #e0e0e0; }
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Share Tech Mono', monospace; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        h1 { color: var(--neon-green); text-shadow: 0 0 10px rgba(0, 255, 65, 0.5); text-align: center; border-bottom: 1px solid var(--neon-green); padding-bottom: 10px; width: 100%; max-width: 900px; }
         .container { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 20px; }
         .card { background: var(--panel-bg); border: 1px solid #333; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
         .card h2 { margin-top: 0; color: var(--neon-green); font-size: 1.2rem; }
@@ -63,15 +35,18 @@
     <h1>☢️ RICK OS - MONITOR MULTIVERSAL ☢️</h1>
 
     <div class="container">
+        
+        <!-- SECCIÓN 1: CREADOR DE BOTS -->
         <div class="card">
             <h2>>_ INYECTAR NUEVO SUB-BOT</h2>
             <div class="creator-form">
-                <input type="number" id="input_numero" placeholder="Ej: 521XXXXXXXXXX">
+                <input type="number" id="input_numero" placeholder="Ej: 521XXXXXXXXXX (Código de país + número)">
                 <button onclick="solicitarCodigo()">GENERAR CÓDIGO</button>
             </div>
             <div id="codigo_generado">CÓDIGO: <span id="pairing_text" style="color: var(--neon-green);">...</span></div>
         </div>
 
+        <!-- SECCIÓN 2: RADAR DE ACTIVOS -->
         <div class="card">
             <h2>>_ RADAR DE CONEXIONES ACTIVAS (<span id="total_bots">0</span>)</h2>
             <div class="table-container">
@@ -92,11 +67,12 @@
                 </table>
             </div>
         </div>
+
     </div>
 
     <script>
-        // 🔗 TU NUEVO TÚNEL ANTI-BLOQUEOS
-        const API_URL = "https://rick-api-adriano-v143.serveo.net";
+        // 🔗 CONECTADO EXACTAMENTE A TU ARCHIVO START.SH
+        const API_URL = "https://rick-the-adriano-mx-v143.serveo.net";
 
         function calcularUptime(msInicio) {
             const diff = Date.now() - msInicio;
@@ -116,7 +92,7 @@
                     const tbody = document.getElementById('tabla_bots');
                     
                     if (data.totalActivos === 0) {
-                        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay Sub-Bots activos. Escríbele a uno para que aparezca.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay Sub-Bots activos en este momento.</td></tr>`;
                         return;
                     }
 
@@ -130,13 +106,15 @@
                             <td>${calcularUptime(bot.uptime)}</td>
                             <td class="stats-ok">${bot.stats.comandosUsados}</td>
                             <td class="${bot.stats.errores > 0 ? 'stats-err' : ''}">${bot.stats.errores}</td>
-                            <td><a href="https://wa.me/${bot.id}" target="_blank" class="btn-wa">Mensaje</a></td>
+                            <td>
+                                <a href="https://wa.me/${bot.id}" target="_blank" class="btn-wa">Mensaje</a>
+                            </td>
                         `;
                         tbody.appendChild(tr);
                     });
                 }
             } catch (error) {
-                console.error("Esperando conexión...");
+                console.error("Esperando conexión o Serveo pide confirmación manual...");
             }
         }
 
@@ -148,7 +126,6 @@
             document.getElementById('pairing_text').innerText = "CONECTANDO AL SERVIDOR...";
             
             try {
-                // 1. Enviamos la orden a Termux para que empiece a pedir el código
                 await fetch(`${API_URL}/api/generar_codigo`, {
                     method: 'POST',
                     body: JSON.stringify({ numero: numero })
@@ -156,7 +133,6 @@
 
                 document.getElementById('pairing_text').innerText = "ESPERANDO A WHATSAPP...";
 
-                // 2. Le preguntamos a Termux cada 2 segundos si ya tiene el código
                 const intervalo = setInterval(async () => {
                     const res = await fetch(`${API_URL}/api/leer_codigo?id=${numero}`);
                     const data = await res.json();
@@ -167,7 +143,6 @@
                     }
                 }, 2000);
 
-                // Si WhatsApp no responde en 30 segundos, detenemos la búsqueda
                 setTimeout(() => {
                     clearInterval(intervalo);
                     if(document.getElementById('pairing_text').innerText === "ESPERANDO A WHATSAPP...") {
@@ -176,12 +151,13 @@
                 }, 30000);
 
             } catch (e) {
-                document.getElementById('pairing_text').innerText = "TÚNEL CERRADO";
+                document.getElementById('pairing_text').innerText = "ERROR DE TÚNEL";
             }
         }
 
         actualizarRadar();
         setInterval(actualizarRadar, 5000);
+
     </script>
 </body>
 </html>
