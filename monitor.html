@@ -69,7 +69,11 @@
     </div>
 
     <script>
-        const API_URL = "https://rick-the-adriano-mx-v143.serveo.net";
+        // 🔗 TU NUEVO PUENTE TRASERO EXCLUSIVO
+        const API_URL = "https://rick-api-monitor.loca.lt";
+        
+        // Llave maestra para pasar de largo la advertencia de LocalTunnel
+        const HEADERS_API = { "Bypass-Tunnel-Reminder": "true", "Content-Type": "application/json" };
 
         function calcularUptime(msInicio) {
             const diff = Date.now() - msInicio;
@@ -81,12 +85,7 @@
 
         async function actualizarRadar() {
             try {
-                // RUTA POST: Esquiva el bloqueo HTML de Serveo
-                const res = await fetch(`${API_URL}/api/subbots_stats`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({})
-                });
+                const res = await fetch(`${API_URL}/api/subbots_stats`, { headers: HEADERS_API });
                 const data = await res.json();
                 
                 if (data.success) {
@@ -130,18 +129,14 @@
             try {
                 await fetch(`${API_URL}/api/generar_codigo`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: HEADERS_API,
                     body: JSON.stringify({ numero: numero })
                 });
 
                 document.getElementById('pairing_text').innerText = "ESPERANDO A WHATSAPP...";
 
                 const intervalo = setInterval(async () => {
-                    const res = await fetch(`${API_URL}/api/leer_codigo`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id: numero })
-                    });
+                    const res = await fetch(`${API_URL}/api/leer_codigo?id=${numero}`, { headers: HEADERS_API });
                     const data = await res.json();
                     
                     if (data.success && data.codigo) {
