@@ -64,13 +64,9 @@
                 </table>
             </div>
         </div>
-
     </div>
 
     <script>
-        // 🔑 LA PUERTA TRASERA DE SERVEO PARA EVADIR LA PANTALLA DE ADVERTENCIA
-        const API_URL = "https://rick-the-adriano-mx-v13.serveousercontent.com";
-
         function calcularUptime(msInicio) {
             const diff = Date.now() - msInicio;
             const horas = Math.floor(diff / (1000 * 60 * 60));
@@ -81,13 +77,14 @@
 
         async function actualizarRadar() {
             try {
-                const res = await fetch(`${API_URL}/api/subbots_stats`, {
+                // Ya no necesitamos la URL de Serveo. Como vivimos en el servidor, usamos ruta relativa.
+                const res = await fetch(`/api/subbots_stats`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({})
                 });
                 
-                if (!res.ok) throw new Error(`Bloqueo de red (Error ${res.status})`);
+                if (!res.ok) throw new Error(`Red apagada`);
                 
                 const data = await res.json();
                 
@@ -128,21 +125,20 @@
             document.getElementById('pairing_text').innerText = "CONECTANDO AL SERVIDOR...";
             
             try {
-                const resInicio = await fetch(`${API_URL}/api/generar_codigo`, {
+                const resInicio = await fetch(`/api/generar_codigo`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ numero: numero })
                 });
 
                 if (!resInicio.ok) throw new Error("Túnel bloqueado");
-
                 document.getElementById('pairing_text').innerText = "ESPERANDO A WHATSAPP...";
 
                 const intervalo = setInterval(async () => {
                     try {
-                        const res = await fetch(`${API_URL}/api/leer_codigo`, {
+                        const res = await fetch(`/api/leer_codigo`, {
                             method: 'POST',
-                            headers: { 'Content-Type': 'text/plain' },
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ id: numero })
                         });
                         const data = await res.json();
