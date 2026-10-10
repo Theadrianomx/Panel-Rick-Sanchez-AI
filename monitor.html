@@ -64,10 +64,12 @@
                 </table>
             </div>
         </div>
+
     </div>
 
     <script>
-        const API_URL = "https://rick-the-adriano-mx-v143.serveousercontent.com";
+        // Usamos el dominio principal que nunca cae, con el disfraz de Texto Plano
+        const API_URL = "https://rick-the-adriano-mx-v13.serveo.net";
 
         function calcularUptime(msInicio) {
             const diff = Date.now() - msInicio;
@@ -81,9 +83,12 @@
             try {
                 const res = await fetch(`${API_URL}/api/subbots_stats`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain' }, // 🥷 DISFRAZ NINJA PARA EVADIR SERVEO
                     body: JSON.stringify({})
                 });
+                
+                if (!res.ok) throw new Error(`Serveo bloqueó la conexión (Error ${res.status})`);
+                
                 const data = await res.json();
                 
                 if (data.success) {
@@ -110,7 +115,10 @@
                         tbody.appendChild(tr);
                     });
                 }
-            } catch (error) {}
+            } catch (error) {
+                // Si falla, ahora nos dirá el porqué en pantalla
+                document.getElementById('tabla_bots').innerHTML = `<tr><td colspan="6" class="stats-err" style="text-align:center;">❌ ERROR: ${error.message}. ¿Está encendido el servidor?</td></tr>`;
+            }
         }
 
         async function solicitarCodigo() {
@@ -121,11 +129,13 @@
             document.getElementById('pairing_text').innerText = "CONECTANDO AL SERVIDOR...";
             
             try {
-                await fetch(`${API_URL}/api/generar_codigo`, {
+                const resInicio = await fetch(`${API_URL}/api/generar_codigo`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain' }, // 🥷 DISFRAZ NINJA
                     body: JSON.stringify({ numero: numero })
                 });
+
+                if (!resInicio.ok) throw new Error("Túnel bloqueado");
 
                 document.getElementById('pairing_text').innerText = "ESPERANDO A WHATSAPP...";
 
@@ -133,7 +143,7 @@
                     try {
                         const res = await fetch(`${API_URL}/api/leer_codigo`, {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: { 'Content-Type': 'text/plain' },
                             body: JSON.stringify({ id: numero })
                         });
                         const data = await res.json();
@@ -142,7 +152,7 @@
                             document.getElementById('pairing_text').innerText = data.codigo;
                             clearInterval(intervalo);
                         }
-                    } catch (e) {}
+                    } catch(e) {}
                 }, 2000);
 
                 setTimeout(() => {
