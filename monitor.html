@@ -34,7 +34,6 @@
     <h1>☢️ RICK OS - MONITOR MULTIVERSAL ☢️</h1>
 
     <div class="container">
-        
         <div class="card">
             <h2>>_ INYECTAR NUEVO SUB-BOT</h2>
             <div class="creator-form">
@@ -77,14 +76,14 @@
 
         async function actualizarRadar() {
             try {
-                // Ya no necesitamos la URL de Serveo. Como vivimos en el servidor, usamos ruta relativa.
-                const res = await fetch(`/api/subbots_stats`, {
+                // 📡 Ruta relativa: Pide los datos al mismo puerto 3002 donde vive
+                const res = await fetch('/api/subbots_stats', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({})
                 });
                 
-                if (!res.ok) throw new Error(`Red apagada`);
+                if (!res.ok) throw new Error(`Conexión interrumpida`);
                 
                 const data = await res.json();
                 
@@ -93,7 +92,7 @@
                     const tbody = document.getElementById('tabla_bots');
                     
                     if (data.totalActivos === 0) {
-                        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay Sub-Bots activos en la memoria.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay Sub-Bots activos en el radar.</td></tr>`;
                         return;
                     }
 
@@ -113,7 +112,7 @@
                     });
                 }
             } catch (error) {
-                document.getElementById('tabla_bots').innerHTML = `<tr><td colspan="6" class="stats-err" style="text-align:center;">❌ ERROR: ${error.message}. Verifica que Termux esté encendido.</td></tr>`;
+                document.getElementById('tabla_bots').innerHTML = `<tr><td colspan="6" class="stats-err" style="text-align:center;">❌ ERROR: ${error.message}. Reconectando...</td></tr>`;
             }
         }
 
@@ -122,21 +121,21 @@
             if (!numero) return alert("Ingresa un número válido.");
             
             document.getElementById('codigo_generado').style.display = "block";
-            document.getElementById('pairing_text').innerText = "CONECTANDO AL SERVIDOR...";
+            document.getElementById('pairing_text').innerText = "CONECTANDO...";
             
             try {
-                const resInicio = await fetch(`/api/generar_codigo`, {
+                const resInicio = await fetch('/api/generar_codigo', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ numero: numero })
                 });
 
-                if (!resInicio.ok) throw new Error("Túnel bloqueado");
-                document.getElementById('pairing_text').innerText = "ESPERANDO A WHATSAPP...";
+                if (!resInicio.ok) throw new Error("Error interno");
+                document.getElementById('pairing_text').innerText = "ESPERANDO WHATSAPP...";
 
                 const intervalo = setInterval(async () => {
                     try {
-                        const res = await fetch(`/api/leer_codigo`, {
+                        const res = await fetch('/api/leer_codigo', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ id: numero })
@@ -152,18 +151,18 @@
 
                 setTimeout(() => {
                     clearInterval(intervalo);
-                    if(document.getElementById('pairing_text').innerText === "ESPERANDO A WHATSAPP...") {
-                        document.getElementById('pairing_text').innerText = "TIEMPO AGOTADO - REINTENTA";
+                    if(document.getElementById('pairing_text').innerText === "ESPERANDO WHATSAPP...") {
+                        document.getElementById('pairing_text').innerText = "TIEMPO AGOTADO";
                     }
                 }, 30000);
 
             } catch (e) {
-                document.getElementById('pairing_text').innerText = "ERROR DE CONEXIÓN";
+                document.getElementById('pairing_text').innerText = "ERROR";
             }
         }
 
         actualizarRadar();
-        setInterval(actualizarRadar, 5000);
+        setInterval(actualizarRadar, 3000); // Refresco más rápido (cada 3s)
     </script>
 </body>
 </html>
