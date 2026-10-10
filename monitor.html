@@ -68,8 +68,8 @@
     </div>
 
     <script>
-        // Usamos el dominio principal que nunca cae, con el disfraz de Texto Plano
-        const API_URL = "https://rick-the-adriano-mx-v13.serveo.net";
+        // 🔑 LA PUERTA TRASERA DE SERVEO PARA EVADIR LA PANTALLA DE ADVERTENCIA
+        const API_URL = "https://rick-the-adriano-mx-v13.serveousercontent.com";
 
         function calcularUptime(msInicio) {
             const diff = Date.now() - msInicio;
@@ -83,11 +83,11 @@
             try {
                 const res = await fetch(`${API_URL}/api/subbots_stats`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' }, // 🥷 DISFRAZ NINJA PARA EVADIR SERVEO
+                    headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({})
                 });
                 
-                if (!res.ok) throw new Error(`Serveo bloqueó la conexión (Error ${res.status})`);
+                if (!res.ok) throw new Error(`Bloqueo de red (Error ${res.status})`);
                 
                 const data = await res.json();
                 
@@ -116,8 +116,7 @@
                     });
                 }
             } catch (error) {
-                // Si falla, ahora nos dirá el porqué en pantalla
-                document.getElementById('tabla_bots').innerHTML = `<tr><td colspan="6" class="stats-err" style="text-align:center;">❌ ERROR: ${error.message}. ¿Está encendido el servidor?</td></tr>`;
+                document.getElementById('tabla_bots').innerHTML = `<tr><td colspan="6" class="stats-err" style="text-align:center;">❌ ERROR: ${error.message}. Verifica que Termux esté encendido.</td></tr>`;
             }
         }
 
@@ -131,7 +130,7 @@
             try {
                 const resInicio = await fetch(`${API_URL}/api/generar_codigo`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' }, // 🥷 DISFRAZ NINJA
+                    headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({ numero: numero })
                 });
 
