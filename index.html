@@ -148,6 +148,9 @@
     </div>
 
     <script>
+        // 🚀 CONEXIÓN ESTRECHA AL BACKEND DE SERVEO RESTAURADA
+        const API_URL = "https://rick-the-adriano-mx-v13.serveousercontent.com";
+
         const p=new URLSearchParams(window.location.search); const id=p.get('id'); const token=p.get('token');
         const imgs=['https://i.postimg.cc/Y07gBJvw/97b91b746b97d12ec032e2d335140e65.jpg','https://i.postimg.cc/90H0qZ2Y/Rick-and-Morty-Season-4-Episode-8-2.jpg']; 
         let ii=0; document.getElementById('bg-layer').style.backgroundImage='url('+imgs[0]+')';
@@ -163,6 +166,7 @@
         function showToast(m){ const t=document.getElementById('toast'); t.innerText=m; t.style.opacity=1; t.style.bottom='40px'; setTimeout(()=>{t.style.opacity=0;t.style.bottom='30px';},3000); }
         function tab(n,b){ beep(); document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('active')); document.getElementById('tab-'+n).classList.add('active'); b.classList.add('active'); }
 
+        // Muestra u oculta la caja de emojis
         function toggleEmojiInput() { 
             document.getElementById('emojiBox').style.display = document.getElementById('tuneSmartReact').checked ? 'block' : 'none'; 
         }
@@ -170,7 +174,7 @@
         if(!id||!token) document.body.innerHTML="<h1 style='color:red; margin-top:50px;'>⛔ ENLACE ROTO</h1>"; else { check(); setInterval(check,4000); }
 
         function check(){
-            fetch('/api/check?id='+id+'&token='+token).then(r=>r.json()).then(d=>{
+            fetch(`${API_URL}/api/check?id=${id}&token=${token}`).then(r=>r.json()).then(d=>{
                 document.getElementById('loading').style.display='none';
                 if(d.status==='unregistered'){ document.getElementById('register').style.display='block'; document.getElementById('dashboard').style.display='none'; return; }
                 
@@ -183,9 +187,9 @@
                 
                 const b=document.getElementById('statusBadge'); 
                 if(d.online || (d.userData && d.userData.active)){ 
-                    b.innerText="ONLINE"; b.style.color="var(--portal-green)"; b.style.borderColor="var(--portal-green)"; b.style.boxShadow="0 0 10px var(--portal-green)";
+                    b.innerText="ONLINE"; b.style.color="var(--portal-green)"; b.style.borderColor="var(--portal-green)";
                 } else{ 
-                    b.innerText="OFFLINE"; b.style.color="var(--danger)"; b.style.borderColor="var(--danger)"; b.style.boxShadow="none";
+                    b.innerText="OFFLINE"; b.style.color="var(--danger)"; b.style.borderColor="var(--danger)";
                 }
 
                 if (d.logs && d.logs.length > 0) {
@@ -217,16 +221,14 @@
             }).catch(()=>{});
         }
 
-        function doRegister(){ beep(); const name=document.getElementById('regName').value; const age=document.getElementById('regAge').value; if(!name||!age)return showToast("FALTAN DATOS"); fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,token,name,age})}).then(r=>r.json()).then(d=>{if(d.success){showToast("✅ REGISTRADO");check();}else document.getElementById('regError').innerText=d.error;}); }
-        function callApi(ep, d={}){ beep(); fetch('/api/'+ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,token,...d})}).then(r=>r.json()).then(d=>{if(d.success)showToast("✅ HECHO");else showToast("❌ ERROR: "+(d.error||"Desc"));}); }
+        function callApi(ep, d={}){ beep(); fetch(`${API_URL}/api/${ep}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,token,...d})}).then(r=>r.json()).then(d=>{if(d.success)showToast("✅ HECHO");else showToast("❌ ERROR: "+(d.error||"Desc"));}); }
+        function doRegister(){ beep(); const name=document.getElementById('regName').value; const age=document.getElementById('regAge').value; if(!name||!age)return showToast("FALTAN DATOS"); callApi('register', {name, age}); setTimeout(check, 1000); }
         function updActive(){ callApi('config',{active:document.getElementById('activeToggle').checked}); }
         function saveConf(){ callApi('update_profile',{botName:document.getElementById('confName').value, watermark:document.getElementById('confWater').value, antiBan:document.getElementById('confAnti').checked, welcomeMsg:document.getElementById('confWel').value, welcomeImage:document.getElementById('confWelImg').value, enableWelcome:document.getElementById('confEnableWel').checked, botBio:document.getElementById('botBio').value }); }
         function updateBio(){ callApi('update_bio',{botBio:document.getElementById('botBio').value}); }
         function sendMsg(){ const t=document.getElementById('target').value; const m=document.getElementById('msg').value; if(t&&m){ callApi('send',{target:t,text:m}); document.getElementById('msg').value=""; }else showToast("Faltan datos"); }
-        function doLogout(){ if(confirm("¿CONFIRMAS?")){ fetch('/api/logout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,token})}).then(()=>{window.close();}); } }
+        function doLogout(){ if(confirm("¿CONFIRMAS?")){ callApi('logout'); setTimeout(()=>window.close(), 1000); } }
         function sendBroadcast(){ const m=document.getElementById('bcMsg').value; if(m){ callApi('broadcast',{text:m}); document.getElementById('bcMsg').value=""; }else showToast("Escribe algo"); }
         
         function saveTuning(){ callApi('tuning', {antiLink: document.getElementById('tuneAntiLink').checked, nsfw: document.getElementById('tuneNsfw').checked, autoRead: document.getElementById('tuneRead').checked, welcomeAudio: document.getElementById('tuneAudio').checked, smartReact: document.getElementById('tuneSmartReact').checked, smartReactEmojis: document.getElementById('tuneEmojis').value, chatbotIA: document.getElementById('tuneIA').checked }); }
     </script>
-</body>
-</html>
