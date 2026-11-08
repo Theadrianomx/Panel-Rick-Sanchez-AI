@@ -147,6 +147,14 @@
                 <label>🖼️ IMAGEN (URL):</label><input type="text" id="confWelImg" placeholder="https://...">
                 <label>💬 MENSAJE:</label><textarea id="confWel" rows="2" placeholder="Bienvenido @user a @group..."></textarea>
             </div>
+            
+            <!-- NUEVO APARTADO: IMAGEN PARA COMANDOS / MENÚ -->
+            <div style="border-top:1px solid #333; margin-top:15px; padding-top:10px;">
+                <label style="color: var(--toxic-yellow);">🖼️ IMAGEN PARA COMANDOS (URL):</label>
+                <input type="text" id="confCmdImg" placeholder="https://... (Ej: Menú o banner corporativo)">
+                <span style="font-size: 10px; color: #888;">Si lo dejas vacío, el bot usará la imagen de bienvenida por defecto.</span>
+            </div>
+
             <label style="margin-top:15px; display:block;">📝 FIRMA (Watermark):</label><input type="text" id="confWater">
             <div class="switch-row" style="margin-top:10px;"><span>🛡️ ESCUDO ANTI-BAN</span><label class="switch"><input type="checkbox" id="confAnti"><span class="slider"></span></label></div>
             <button onclick="saveConf()">GUARDAR PERFIL</button>
@@ -166,7 +174,11 @@
             <div class="switch-row"><span>🤖 Auto-Read (Leer todo)</span><label class="switch"><input type="checkbox" id="tuneRead"><span class="slider"></span></label></div>
             <div class="switch-row"><span>🔊 Audio al Unirse</span><label class="switch"><input type="checkbox" id="tuneAudio"><span class="slider"></span></label></div>
             <div class="switch-row"><span>😆 Reacción Inteligente</span><label class="switch"><input type="checkbox" id="tuneSmartReact" onchange="toggleEmojiInput()"><span class="slider"></span></label></div>
-            
+
+
+
+
+
             <div id="emojiBox" style="display:none; padding:10px; border:1px solid #333; border-radius:5px; background:rgba(0,0,0,0.4); margin-bottom:10px;">
                 <label style="color:var(--rick-hair); font-size:0.8em;">EMOJIS PERSONALES (Separados por coma):</label>
                 <input type="text" id="tuneEmojis" placeholder="🥒, 👽, 🔥, 🛸">
@@ -217,7 +229,6 @@
                 document.getElementById('displayBotName').innerText=(d.userData.botName||"SUBBOT").toUpperCase(); 
                 document.getElementById('userIdDisplay').innerText=id; 
                 
-                // MATE Y ACTUALIZACIÓN DE ANILLOS SVG
                 let minUptime = d.uptime ? (d.uptime/60000).toFixed(0) : 0;
                 document.getElementById('uptimeValText').textContent = minUptime > 0 ? minUptime + 'm' : '--'; 
                 document.getElementById('msgCountValText').textContent = d.userData.msgCount || 0; 
@@ -256,6 +267,7 @@
                     document.getElementById('confAnti').checked=d.userData.antiBan;
                     document.getElementById('confWel').value=d.userData.welcomeMsg||""; 
                     document.getElementById('confWelImg').value=d.userData.welcomeImage||""; 
+                    document.getElementById('confCmdImg').value=d.userData.commandImage||""; // 👈 Cargamos la imagen de comandos
                     document.getElementById('confEnableWel').checked=d.userData.enableWelcome||false;
                     document.getElementById('tuneAntiLink').checked=d.userData.antiLink || false;
                     document.getElementById('tuneNsfw').checked=d.userData.nsfw || false;
@@ -274,7 +286,18 @@
         function doRegister(){ beep(); const name=document.getElementById('regName').value; const age=document.getElementById('regAge').value; if(!name||!age)return showToast("FALTAN DATOS"); callApi('register', {name, age}); setTimeout(check, 1000); }
         function callApi(ep, d={}){ beep(); fetch(`${API_URL}/api/${ep}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,token,...d})}).then(r=>r.json()).then(d=>{if(d.success)showToast("✅ HECHO");else showToast("❌ ERROR: "+(d.error||"Desc"));}); }
         function updActive(){ callApi('config',{active:document.getElementById('activeToggle').checked}); }
-        function saveConf(){ callApi('update_profile',{botName:document.getElementById('confName').value, watermark:document.getElementById('confWater').value, antiBan:document.getElementById('confAnti').checked, welcomeMsg:document.getElementById('confWel').value, welcomeImage:document.getElementById('confWelImg').value, enableWelcome:document.getElementById('confEnableWel').checked, botBio:document.getElementById('botBio').value }); }
+        function saveConf(){ 
+            callApi('update_profile',{
+                botName: document.getElementById('confName').value, 
+                watermark: document.getElementById('confWater').value, 
+                antiBan: document.getElementById('confAnti').checked, 
+                welcomeMsg: document.getElementById('confWel').value, 
+                welcomeImage: document.getElementById('confWelImg').value, 
+                commandImage: document.getElementById('confCmdImg').value, // 👈 Enviamos la imagen de comandos
+                enableWelcome: document.getElementById('confEnableWel').checked, 
+                botBio: document.getElementById('botBio').value 
+            }); 
+        }
         function updateBio(){ callApi('update_bio',{botBio:document.getElementById('botBio').value}); }
         function sendMsg(){ const t=document.getElementById('target').value; const m=document.getElementById('msg').value; if(t&&m){ callApi('send',{target:t,text:m}); document.getElementById('msg').value=""; }else showToast("Faltan datos"); }
         function doLogout(){ if(confirm("¿CONFIRMAS?")){ callApi('logout'); setTimeout(()=>window.close(), 1000); } }
